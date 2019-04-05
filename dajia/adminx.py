@@ -21,7 +21,7 @@ class Merchantxadmin(object):
 xadmin.site.register(Merchant,Merchantxadmin)
 
 class Productionxadmin(object):
-    list_display = {'productionid','team','merchant','name','reputation','introduction','type','cutnumber','saveprice'}
+    list_display = {'productionid','team','merchant','name','reputation','introduction','introductionpic','type','cutnumber','saveprice'}
     search_fields = {'team__name','merchant__name'}
     list_filter = {'type'}
 xadmin.site.register(Production,Productionxadmin)
@@ -42,21 +42,21 @@ xadmin.site.register(Steam,Steamxadmin)
 
 
 class Commentxadmin(object):
-    list_display = {'commentid','production','user','context','time','status'}
+    list_display = {'commentid','production','user','context','time','status','judge'}
     search_fields = {'production__name','user__name'}
-    list_filter = {'status'}
+    list_filter = {'status','judge'}
 xadmin.site.register(Comment,Commentxadmin)
 
 
 class Orderxadmin(object):
-    list_display = {}
-    search_fields = {}
-    list_filter = {}
+    list_display = {'orderid','user','period','production','steam','status','cutprice','time1','time2','time3','time4','time5','time6','comment'}
+    search_fields = {'user__name','production__name'}
+    list_filter = {'status'}
 xadmin.site.register(Order,Orderxadmin)
 
 class Cuttingxadmin(object):
-    list_display = {}
-    search_fields = {}
-    list_filter = {}
+    list_display = {'cutid','audience','steam','cutprice','time'}
+    search_fields = {'steam__steamid','steam__master__name'}
+    list_filter = {'cutprice'}
 xadmin.site.register(Cutting,Cuttingxadmin)
 

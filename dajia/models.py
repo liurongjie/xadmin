@@ -58,7 +58,7 @@ class  Production(models.Model):
         (4, "小语种"),
     )
     introduction=models.CharField(max_length=100,verbose_name="产品文字介绍")
-    introducitonpic=models.ImageField(upload_to="production",verbose_name="产品图片介绍")
+    introductionpic=models.ImageField(upload_to="production",verbose_name="产品图片介绍")
     type = models.IntegerField(choices=CHOICE, verbose_name="产品类别")
     cutnumber = models.IntegerField(default=0,verbose_name="砍价人次")
     saveprice = models.FloatField(default=0,verbose_name="累计节省")
@@ -136,7 +136,6 @@ class Order(models.Model):
         (4, "订单完成"),
         (5, "评价完成"),
     )
-    ordertime=models.DateTimeField(auto_now=True,verbose_name="订单生成时间")
     status=models.IntegerField(choices=CHOICE,default=1,verbose_name="状态")
     cutprice=models.FloatField(verbose_name="参团成员砍价")
     time1 = models.DateTimeField(auto_now_add=True, verbose_name="预付完成时间")
