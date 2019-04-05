@@ -9,13 +9,19 @@ class Team(models.Model):
         get_latest_by = "time"
 class User(models.Model):
     openid=models.CharField(max_length=100,primary_key=True,verbose_name="唯一身份标识openid")
-    name = models.CharField(max_length=30, verbose_name="姓名")
+    nickname = models.CharField(max_length=30, verbose_name="昵称")
     picture = models.ImageField(upload_to="userpic", verbose_name="微信头像")
     CHOICE = (
         (0, "未实名认证"),
         (1, "实名认证通过"),
     )
+    CHOICEGender = (
+        (0, "男"),
+        (1, "女"),
+    )
+    gender=models.IntegerField(choices=CHOICEGender,verbose_name="性别")
     status = models.IntegerField(choices=CHOICE, verbose_name="是否完成实名认证")
+    name=models.CharField(max_length=30,verbose_name="姓名",null=True,blank=True)
     number=models.CharField(null=True, blank=True,max_length=15,verbose_name="学号")
     telephone=models.CharField(null=True, blank=True,max_length=11,verbose_name="联系方式")
     department=models.CharField(null=True, blank=True,max_length=20,verbose_name="学院")

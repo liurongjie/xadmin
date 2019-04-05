@@ -46,7 +46,7 @@ def login(request):
     if request.method == "POST":
         pic = handle_upload_file(request.FILES['file'], str(request.FILES['file']))
         code = request.POST.get('code')
-        name = request.POST.get('name')
+        nickname = request.POST.get('nickname')
         appid = 'wx2b21ee85de8b10a9'
         appSecret = 'e3ce059551daa9fdd4657a6445d2b265'
         data = {
@@ -66,7 +66,7 @@ def login(request):
             back = serializer(newaccount)
             return JsonResponse(back)
         else:
-            newaccount = User(openid=openid, name=name,picture=pic,status=0)
+            newaccount = User(openid=openid,nickname=nickname,picture=pic,status=0)
             newaccount.save()
             back = serializer(newaccount)
             return JsonResponse(back)
