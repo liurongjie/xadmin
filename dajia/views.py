@@ -65,13 +65,15 @@ def login(request):
         account = User.objects.filter(openid=openid).exists()
         if account:
             newaccount = User.objects.get(openid=openid)
-            back = serializer(newaccount)
-            return JsonResponse(back)
+            if newaccount.status == 0:
+                return JsonResponse({"openid": openid,"status":0})
+            else:
+                return JsonResponse({"openid": openid,"name":newaccount.name,"team_name":newaccount.team.teamname,"number":newaccount.number,"status":1})
+
         else:
             newaccount = User(openid=openid,nickname=nickname,picture=pic,gender=gender,status=0)
             newaccount.save()
-            back = serializer(newaccount)
-            return JsonResponse(back)
+            return JsonResponse({"openid":openid,"status":0})
 
 
 
@@ -89,7 +91,7 @@ def verify(request):
         team=Team.objects.get(teamid=teamid)
         account = User.objects.filter(openid=openid,status=1).exists()
         if account:
-            return JsonResponse("该账号已注册")
+            return JsonResponse("该账号已注册",safe=False)
         else:
             account = User.objects.get(openid=openid)
             account.name = name
@@ -99,7 +101,7 @@ def verify(request):
             account.status = 1
             account.team = team
             account.save()
-            return JsonResponse("true")
+            return JsonResponse("true",safe=False)
 
 
 #home页boat组件的信息获取
@@ -249,7 +251,7 @@ def buytogether(request):
     steam = Steam.objects.get(steamid=steamid)
     if steam.steamnumber <= 4:
         period.cutnumber = period.cutnumber + 1
-        period.saveprie += price
+        period.saveprice += price
         period.save()
         steam.steamnumber = steam.steamnumber + 1
         steam.cutprice += price

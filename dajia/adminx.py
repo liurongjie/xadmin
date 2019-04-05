@@ -25,7 +25,7 @@ class Teamxadmin(object):
 xadmin.site.register(Team,Teamxadmin)
 
 class Userxadmin(object):
-    list_display = {'openid', 'nickname', 'picture','gender', 'status','number','telephone','department','team'}
+    list_display = {'openid', 'nickname', 'picture','gender', 'status','number','telephone','department','team','name'}
     search_fields = {'team__teamname','nickname'}
     list_filter = {'gender','status'}
 xadmin.site.register(User,Userxadmin)

@@ -24,6 +24,7 @@ class User(models.Model):
         (1, "实名认证通过"),
     )
     status = models.IntegerField(choices=CHOICE, verbose_name="是否完成实名认证")
+    name=models.CharField(null=True, blank=True,max_length=15,verbose_name="姓名")
     number=models.CharField(null=True, blank=True,max_length=15,verbose_name="学号")
     telephone=models.CharField(null=True, blank=True,max_length=11,verbose_name="联系方式")
     department=models.CharField(null=True, blank=True,max_length=20,verbose_name="学院")
