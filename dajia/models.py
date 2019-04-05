@@ -6,6 +6,7 @@ class Team(models.Model):
     logo=models.ImageField(upload_to="teamlogo",verbose_name="团队logo")
     time = models.DateTimeField(auto_now_add=True, verbose_name="期表创建时间")
     class Meta:
+        verbose_name="团队"
         get_latest_by = "time"
 class User(models.Model):
     openid=models.CharField(max_length=100,primary_key=True,verbose_name="唯一身份标识openid")
@@ -25,6 +26,9 @@ class User(models.Model):
     telephone=models.CharField(null=True, blank=True,max_length=11,verbose_name="联系方式")
     department=models.CharField(null=True, blank=True,max_length=20,verbose_name="学院")
     team = models.ForeignKey(Team, null=True, blank=True, on_delete=models.SET_NULL,related_name="user")#外键连接名称
+    class Meta:
+        verbose_name="用户"
+
 
 class Merchant(models.Model):
     merchantid=models.CharField(primary_key=True,max_length=10,verbose_name="商家id")
@@ -44,6 +48,8 @@ class Merchant(models.Model):
     pic1=models.ImageField(upload_to="photo",verbose_name="商户照片1")
     pic2 = models.ImageField(upload_to="photo", verbose_name="商户照片2")
     pic3 = models.ImageField(upload_to="photo", verbose_name="商户照片3")
+    class Meta:
+        verbose_name="商家"
 #不同学校对应不同的产品
 class  Production(models.Model):
     productionid=models.IntegerField(primary_key=True,verbose_name="产品id")
@@ -62,6 +68,8 @@ class  Production(models.Model):
     type = models.IntegerField(choices=CHOICE, verbose_name="产品类别")
     cutnumber = models.IntegerField(default=0,verbose_name="砍价人次")
     saveprice = models.FloatField(default=0,verbose_name="累计节省")
+    class Meta:
+        verbose_name="产品"
 
 class Period(models.Model):
     periodid=models.CharField(primary_key=True,max_length=50,verbose_name="期表id")
@@ -89,7 +97,7 @@ class Period(models.Model):
     cutnumber = models.IntegerField(default=0,verbose_name="砍价人次")
     saveprice = models.FloatField(default=0,verbose_name="累计节省")
     class Meta:
-        get_latest_by="time"
+        verbose_name="期表"
 
 
 
@@ -99,6 +107,8 @@ class Steam(models.Model):
     cutprice=models.FloatField(verbose_name="团队整体优惠价格")
     steamnumber=models.IntegerField(verbose_name="团队人数")
     master=models.ForeignKey(User,null=True, blank=True, on_delete=models.SET_NULL,related_name="steam")
+    class Meta:
+        verbose_name="小团"
 
 class Comment(models.Model):
     commentid=models.CharField(max_length=50,primary_key=True,verbose_name="评论id")
@@ -119,6 +129,8 @@ class Comment(models.Model):
         (1, "已核查"),
     )
     status=models.IntegerField(default=0,choices=CHOICE,verbose_name="是否审核")
+    class Meta:
+        verbose_name="评论"
 
 
 
@@ -145,6 +157,8 @@ class Order(models.Model):
     time5 = models.DateTimeField(null=True, blank=True, verbose_name="评价完成时间")
     time6=models.DateTimeField(null=True, blank=True, verbose_name="订单取消时间")
     comment=models.ForeignKey(Comment,on_delete=models.CASCADE,related_name="order",null=True, blank=True)
+    class Meta:
+        verbose_name="订单"
 
 class Cutting(models.Model):
     cutid=models.CharField(primary_key=True,max_length=50,verbose_name="砍价编号")
@@ -152,6 +166,8 @@ class Cutting(models.Model):
     steam=models.ForeignKey(Steam,on_delete=models.CASCADE,related_name="cutting")
     cutprice=models.FloatField(verbose_name="砍价")
     time = models.DateTimeField(auto_now_add=True, verbose_name="砍价时间")
+    class Meta:
+        verbose_name="砍价"
 
 
 
