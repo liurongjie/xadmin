@@ -48,6 +48,7 @@ def login(request):
         pic=request.GET.get('pic')
         code = request.GET.get('code')
         nickname = request.GET.get('nickname')
+        gender=request.GET.get('gender')
         appid = 'wx2b21ee85de8b10a9'
         appSecret = 'e3ce059551daa9fdd4657a6445d2b265'
         data = {
@@ -67,7 +68,7 @@ def login(request):
             back = serializer(newaccount)
             return JsonResponse(back)
         else:
-            newaccount = User(openid=openid,nickname=nickname,picture=pic,status=0)
+            newaccount = User(openid=openid,nickname=nickname,picture=pic,gender=gender,status=0)
             newaccount.save()
             back = serializer(newaccount)
             return JsonResponse(back)
@@ -184,6 +185,7 @@ def comment(request):
     if request.method == 'GET':
         orderid=request.GET.get('orderid','')
         context=request.GET.get('context','')
+        judge=request.GET.get('judge','')
         order=Order.objects.get(orderid=orderid)
         user=order.user
         commentid=user.openid+order.period_id
@@ -194,7 +196,7 @@ def comment(request):
             comment1.save()
         else:
             commenModel=Comment(commentid=commentid,context=context,user=user,order=order,status=0, \
-                                production=order.production)
+                                production=order.production,judge=judge)
             nowtime = timezone.now()
             commenModel.save()
             order.time5 = nowtime

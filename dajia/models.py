@@ -14,8 +14,9 @@ class User(models.Model):
     nickname = models.CharField(max_length=30, verbose_name="昵称")
     picture = models.CharField( max_length=50,verbose_name="微信头像")
     CHOICEgender = (
-        (0, "男"),
-        (1, "女"),
+        (0, "未知"),
+        (1, "男"),
+        (2,"女"),
     )
     gender=models.IntegerField(choices=CHOICEgender,verbose_name="性别")
     CHOICE = (

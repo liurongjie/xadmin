@@ -157,6 +157,7 @@ USE_TZ = False
 STATIC_URL = '/static/'
 MEDIA_URL='/uploads/'
 MEDIA_ROOT=os.path.join(BASE_DIR, 'uploads')
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
 #每天00：02分开始核查，将已经结束的期表状态改为0，结束
 #每天02：02分开始核查，将未进行的期表改为正在进行1，
 CRONJOBS=[
