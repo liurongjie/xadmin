@@ -14,3 +14,7 @@ api接口重写
 #xadmin重写
 #User字段重写
 增加gender和nickname字段
+#production重写
+增加文字介绍
+#comment重写
+增加judge字段

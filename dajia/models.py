@@ -11,17 +11,16 @@ class User(models.Model):
     openid=models.CharField(max_length=100,primary_key=True,verbose_name="唯一身份标识openid")
     nickname = models.CharField(max_length=30, verbose_name="昵称")
     picture = models.ImageField(upload_to="userpic", verbose_name="微信头像")
+    CHOICEgender = (
+        (0, "男"),
+        (1, "女"),
+    )
+    gender=models.IntegerField(choices=CHOICEgender,verbose_name="性别")
     CHOICE = (
         (0, "未实名认证"),
         (1, "实名认证通过"),
     )
-    CHOICEGender = (
-        (0, "男"),
-        (1, "女"),
-    )
-    gender=models.IntegerField(choices=CHOICEGender,verbose_name="性别")
     status = models.IntegerField(choices=CHOICE, verbose_name="是否完成实名认证")
-    name=models.CharField(max_length=30,verbose_name="姓名",null=True,blank=True)
     number=models.CharField(null=True, blank=True,max_length=15,verbose_name="学号")
     telephone=models.CharField(null=True, blank=True,max_length=11,verbose_name="联系方式")
     department=models.CharField(null=True, blank=True,max_length=20,verbose_name="学院")
@@ -58,10 +57,11 @@ class  Production(models.Model):
         (3, "考研"),
         (4, "小语种"),
     )
-    introduciton=models.ImageField(upload_to="production",verbose_name="产品介绍")
+    introduction=models.CharField(max_length=100,verbose_name="产品文字介绍")
+    introducitonpic=models.ImageField(upload_to="production",verbose_name="产品图片介绍")
     type = models.IntegerField(choices=CHOICE, verbose_name="产品类别")
-    cutnumber = models.IntegerField(verbose_name="砍价人次")
-    saveprie = models.FloatField(verbose_name="累计节省")
+    cutnumber = models.IntegerField(default=0,verbose_name="砍价人次")
+    saveprice = models.FloatField(default=0,verbose_name="累计节省")
 
 class Period(models.Model):
     periodid=models.CharField(primary_key=True,max_length=50,verbose_name="期表id")
@@ -84,10 +84,10 @@ class Period(models.Model):
         (2, "未开始"),
     )
     status=models.IntegerField(choices=CHOICE,verbose_name="订单状态")
-    cutprice = models.IntegerField(verbose_name="降价")
-    number = models.IntegerField(verbose_name="参团人数")
-    cutnumber = models.IntegerField(verbose_name="砍价人次")
-    saveprie = models.FloatField(verbose_name="累计节省")
+    cutprice = models.IntegerField(default=0,verbose_name="降价")
+    number = models.IntegerField(default=0,verbose_name="参团人数")
+    cutnumber = models.IntegerField(default=0,verbose_name="砍价人次")
+    saveprice = models.FloatField(default=0,verbose_name="累计节省")
     class Meta:
         get_latest_by="time"
 
@@ -106,6 +106,14 @@ class Comment(models.Model):
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="comment")
     context=models.CharField(max_length=200,verbose_name="评论")
     time=models.DateTimeField(auto_now_add=True,verbose_name="评论时间")
+    CHOICEJudge = (
+        (1, "非常不满意"),
+        (2, "不满意"),
+        (3, "一般"),
+        (4, "满意"),
+        (5, "非常满意"),
+    )
+    judge=models.IntegerField(choices=CHOICEJudge,verbose_name="评价")
     CHOICE = (
         (0, "未核查"),
         (1, "已核查"),
