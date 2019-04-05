@@ -7,11 +7,12 @@ class Team(models.Model):
     time = models.DateTimeField(auto_now_add=True, verbose_name="期表创建时间")
     class Meta:
         verbose_name="团队"
+        verbose_name_plural = verbose_name
         get_latest_by = "time"
 class User(models.Model):
     openid=models.CharField(max_length=100,primary_key=True,verbose_name="唯一身份标识openid")
     nickname = models.CharField(max_length=30, verbose_name="昵称")
-    picture = models.ImageField(upload_to="userpic", verbose_name="微信头像")
+    picture = models.CharField( max_length=50,verbose_name="微信头像")
     CHOICEgender = (
         (0, "男"),
         (1, "女"),
@@ -28,6 +29,7 @@ class User(models.Model):
     team = models.ForeignKey(Team, null=True, blank=True, on_delete=models.SET_NULL,related_name="user")#外键连接名称
     class Meta:
         verbose_name="用户"
+        verbose_name_plural = verbose_name
 
 
 class Merchant(models.Model):
@@ -50,6 +52,7 @@ class Merchant(models.Model):
     pic3 = models.ImageField(upload_to="photo", verbose_name="商户照片3")
     class Meta:
         verbose_name="商家"
+        verbose_name_plural = verbose_name
 #不同学校对应不同的产品
 class  Production(models.Model):
     productionid=models.IntegerField(primary_key=True,verbose_name="产品id")
@@ -70,6 +73,7 @@ class  Production(models.Model):
     saveprice = models.FloatField(default=0,verbose_name="累计节省")
     class Meta:
         verbose_name="产品"
+        verbose_name_plural = verbose_name
 
 class Period(models.Model):
     periodid=models.CharField(primary_key=True,max_length=50,verbose_name="期表id")
@@ -98,6 +102,7 @@ class Period(models.Model):
     saveprice = models.FloatField(default=0,verbose_name="累计节省")
     class Meta:
         verbose_name="期表"
+        verbose_name_plural = verbose_name
 
 
 
@@ -109,6 +114,7 @@ class Steam(models.Model):
     master=models.ForeignKey(User,null=True, blank=True, on_delete=models.SET_NULL,related_name="steam")
     class Meta:
         verbose_name="小团"
+        verbose_name_plural = verbose_name
 
 class Comment(models.Model):
     commentid=models.CharField(max_length=50,primary_key=True,verbose_name="评论id")
@@ -131,6 +137,7 @@ class Comment(models.Model):
     status=models.IntegerField(default=0,choices=CHOICE,verbose_name="是否审核")
     class Meta:
         verbose_name="评论"
+        verbose_name_plural = verbose_name
 
 
 
@@ -159,6 +166,7 @@ class Order(models.Model):
     comment=models.ForeignKey(Comment,on_delete=models.CASCADE,related_name="order",null=True, blank=True)
     class Meta:
         verbose_name="订单"
+        verbose_name_plural = verbose_name
 
 class Cutting(models.Model):
     cutid=models.CharField(primary_key=True,max_length=50,verbose_name="砍价编号")
@@ -168,6 +176,7 @@ class Cutting(models.Model):
     time = models.DateTimeField(auto_now_add=True, verbose_name="砍价时间")
     class Meta:
         verbose_name="砍价"
+        verbose_name_plural = verbose_name
 
 
 

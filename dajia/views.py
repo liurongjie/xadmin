@@ -43,10 +43,11 @@ def handle_upload_file(file,filename):
 
 @csrf_exempt
 def login(request):
-    if request.method == "POST":
-        pic = handle_upload_file(request.FILES['file'], str(request.FILES['file']))
-        code = request.POST.get('code')
-        nickname = request.POST.get('nickname')
+    if request.method == "GET":
+        #pic = handle_upload_file(request.FILES['file'], str(request.FILES['file']))
+        pic=request.GET.get('pic')
+        code = request.GET.get('code')
+        nickname = request.GET.get('nickname')
         appid = 'wx2b21ee85de8b10a9'
         appSecret = 'e3ce059551daa9fdd4657a6445d2b265'
         data = {
