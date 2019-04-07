@@ -68,7 +68,7 @@ def login(request):
             if newaccount.status == 0:
                 return JsonResponse({"openid": openid,"status":0})
             else:
-                return JsonResponse({"openid": openid,"name":newaccount.name,"team_name":newaccount.team.teamname,"number":newaccount.number,"status":1})
+                return JsonResponse({"openid": openid,"name":newaccount.name,"team_name":newaccount.team.teamname,"number":newaccount.number[0:4],"status":1})
 
         else:
             newaccount = User(openid=openid,nickname=nickname,picture=pic,gender=gender,status=0)
@@ -101,7 +101,8 @@ def verify(request):
             account.status = 1
             account.team = team
             account.save()
-            return JsonResponse("true",safe=False)
+            return JsonResponse({"openid": openid, "name": name, "team_name": team.teamname,
+                                 "number":number[0:4], "status": 1})
 
 
 #home页boat组件的信息获取
@@ -110,12 +111,14 @@ def home(request):
     if request.method == 'GET':
         pass
         teamid=request.GET.get('teamid','')
-        maindata=Period.objects.filter(production__team_id=teamid,status=1).values('periodid','production','production__name','production__introduciton',\
+        maindata=Period.objects.filter(production__team_id=teamid,status=1).values('periodid','production','production__name', \
+                                                                                   'production__introduction','production__introductionpic',\
                                                                                'startprice','starttime','endtime','type', \
                                                                                'production__merchant__location',\
                                                                                'production__merchant__latitude', 'production__merchant__longitude', \
-                                                                               'number','cutnumber','saveprie').all()
-        return JsonResponse(maindata)
+                                                                               'number','cutnumber','saveprice').all()
+        maindata=serializer(maindata)
+        return JsonResponse(maindata,safe=False)
 
 #点击进入详情页，只需获取评论内容
 #给定评论id，返回评论详情
@@ -124,7 +127,7 @@ def home(request):
 def firstcomment(request):
     if request.method == 'GET':
         productionid = request.GET.get('productionid', '')
-        data=Comment.objects.filter(production_id=productionid,status=1).values( 'context','user__name','user__picture','time').all()[0:15]
+        data=Comment.objects.filter(production_id=productionid,status=1).values( 'context','user__name','user__picture','user__team__teamname','time').all()[0:15]
         data=serializer(data)
         return JsonResponse({'success': True, 'data': data})
 
@@ -138,7 +141,7 @@ def scancomment(request):
         periodid = request.GET.get('periodid', '')
         period = Period.objects.get(periodid=periodid)
         comments = Comment.objects.filter(production_id=period.production_id, status=1).values("user__team__logo",  \
-                                                                                               "user__name", "context", "time").all()[number, number+5]
+                                                                                               "user__name", 'user__team__teamname',"context", "time").all()[number, number+5]
         comments = serializer(comments)
         return JsonResponse({'success': True, 'data': comments})
 
@@ -153,9 +156,12 @@ def orderlist(request):
                                                            'production__reputation','period__number','period__status', \
                                                            'period__endtime', \
                                                            'period__startprice','period__cutprice','steam_id')
+        if order:
+            order = serializer(order)
+            return JsonResponse({"response":True,"period": order})
+        else:
+            return JsonResponse({"response":False})
 
-        order=serializer(order)
-        return JsonResponse({"period":order})
 
 
 def orderdetail(request):
