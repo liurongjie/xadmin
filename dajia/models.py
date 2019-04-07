@@ -12,7 +12,7 @@ class Team(models.Model):
 class User(models.Model):
     openid=models.CharField(max_length=100,primary_key=True,verbose_name="唯一身份标识openid")
     nickname = models.CharField(max_length=30, verbose_name="昵称")
-    picture = models.CharField( max_length=50,verbose_name="微信头像")
+    picture = models.CharField( max_length=150,verbose_name="微信头像")
     CHOICEgender = (
         (0, "未知"),
         (1, "男"),
