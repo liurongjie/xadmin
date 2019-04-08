@@ -128,7 +128,7 @@ def home(request):
 def firstcomment(request):
     if request.method == 'GET':
         productionid = request.GET.get('productionid', '')
-        data=Comment.objects.filter(production_id=productionid,status=1).values( 'context','user__name','user__picture','user__team__teamname','time').all()[0:15]
+        data=Comment.objects.filter(production_id=productionid,status=1).values( 'context','user__name','user__department','user__picture','user__team__teamname','time').all()[0:15]
         data=serializer(data)
         return JsonResponse({'success': True, 'data': data})
 
@@ -142,7 +142,8 @@ def scancomment(request):
         periodid = request.GET.get('periodid', '')
         period = Period.objects.get(periodid=periodid)
         comments = Comment.objects.filter(production_id=period.production_id, status=1).values("user__team__logo",  \
-                                                                                               "user__name", 'user__team__teamname',"context", "time").all()[number, number+5]
+                                                                                               "user__name","user__department" \
+                                                                                               ,'user__team__teamname',"context", "time").all()[number, number+5]
         comments = serializer(comments)
         return JsonResponse({'success': True, 'data': comments})
 
