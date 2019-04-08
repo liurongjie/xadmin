@@ -61,7 +61,7 @@ class  Production(models.Model):
     team=models.ForeignKey(Team,models.CASCADE,related_name="production")
     merchant=models.ForeignKey(Merchant,on_delete=models.CASCADE,related_name="production")
     name=models.CharField(max_length=20,verbose_name="产品名称")
-    reputation=models.IntegerField(verbose_name="产品评分")
+    reputation=models.FloatField(verbose_name="好评率")
     CHOICE = (
         (1, "健身"),
         (2, "驾校"),
@@ -73,6 +73,7 @@ class  Production(models.Model):
     type = models.IntegerField(choices=CHOICE, verbose_name="产品类别")
     cutnumber = models.IntegerField(default=0,verbose_name="砍价人次")
     saveprice = models.FloatField(default=0,verbose_name="累计节省")
+    distance=models.FloatField(verbose_name="距离")
     class Meta:
         verbose_name="产品"
         verbose_name_plural = verbose_name

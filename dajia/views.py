@@ -117,7 +117,8 @@ def home(request):
                                                                                'production__merchant__location',\
                                                                                'production__merchant__latitude', 'production__merchant__longitude', \
                                                                                'number','cutnumber','saveprice','production__merchant__pic1', \
-                                                                                   'production__merchant__pic2','production__merchant__pic3').all()
+                                                                                   'production__merchant__pic2' \
+                                                                                   ,'production__reputation','production__merchant__pic3').all()
         maindata=serializer(maindata)
         return JsonResponse(maindata,safe=False)
 
@@ -139,11 +140,13 @@ def firstcomment(request):
 def scancomment(request):
     if request.method == 'GET':
         number=request.GET.get('number','')
+        number=int(number)
         periodid = request.GET.get('periodid', '')
+        print(type(number))
         period = Period.objects.get(periodid=periodid)
         comments = Comment.objects.filter(production_id=period.production_id, status=1).values("user__team__logo",  \
                                                                                                "user__name","user__department" \
-                                                                                               ,'user__team__teamname',"context", "time").all()[number, number+5]
+                                                                                               ,'user__team__teamname',"context", "time").all()[number:number+5]
         comments = serializer(comments)
         return JsonResponse({'success': True, 'data': comments})
 
@@ -153,11 +156,11 @@ def orderlist(request):
     if request.method == 'GET':
         openid = request.GET.get('openid', '')
         order=Order.objects.filter(user_id=openid).values('production__merchant__logo','production__name', \
-                                                           'production__merchant__latitude', \
-                                                           'production__merchant__longitude', \
                                                            'production__reputation','period__number','status', \
                                                            'period__endtime', \
-                                                           'period__startprice','period__cutprice','steam_id')
+                                                           'period__startprice','period__cutprice', \
+                                                          'steam_id','steam__cutprice', \
+                                                          'production__team__teamname','production__distance')
         if order:
             order = serializer(order)
             return JsonResponse({"response":True,"period": order})
