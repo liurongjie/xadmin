@@ -116,7 +116,8 @@ def home(request):
                                                                                'startprice','starttime','endtime','type', \
                                                                                'production__merchant__location',\
                                                                                'production__merchant__latitude', 'production__merchant__longitude', \
-                                                                               'number','cutnumber','saveprice').all()
+                                                                               'number','cutnumber','saveprice','production__merchant__pic1', \
+                                                                                   'production__merchant__pic2','production__merchant__pic3').all()
         maindata=serializer(maindata)
         return JsonResponse(maindata,safe=False)
 
@@ -153,7 +154,7 @@ def orderlist(request):
         order=Order.objects.filter(user_id=openid).values('production__merchant__logo','production__name', \
                                                            'production__merchant__latitude', \
                                                            'production__merchant__longitude', \
-                                                           'production__reputation','period__number','period__status', \
+                                                           'production__reputation','period__number','status', \
                                                            'period__endtime', \
                                                            'period__startprice','period__cutprice','steam_id')
         if order:
