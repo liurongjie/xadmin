@@ -120,7 +120,7 @@ class Steam(models.Model):
         verbose_name_plural = verbose_name
 
 class Comment(models.Model):
-    commentid=models.CharField(max_length=50,primary_key=True,verbose_name="评论id")
+    commentid=models.CharField(max_length=150,primary_key=True,verbose_name="评论id")
     production=models.ForeignKey(Production,on_delete=models.CASCADE,related_name="comment")
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="comment")
     context=models.CharField(max_length=200,verbose_name="评论")
@@ -172,7 +172,7 @@ class Order(models.Model):
         verbose_name_plural = verbose_name
 
 class Cutting(models.Model):
-    cutid=models.CharField(primary_key=True,max_length=50,verbose_name="砍价编号")
+    cutid=models.CharField(primary_key=True,max_length=150,verbose_name="砍价编号")
     audience = models.ForeignKey(User, on_delete=models.CASCADE,related_name="cutting")
     steam=models.ForeignKey(Steam,on_delete=models.CASCADE,related_name="cutting")
     cutprice=models.FloatField(verbose_name="砍价")
