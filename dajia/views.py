@@ -271,7 +271,7 @@ def buyalone(request):
         order = Order(orderid=orderid, user=user, period=period, status=1, steam=steam, cutprice=price,
                       production=period.production)
         order.save()
-        return JsonResponse({'success': True, 'reason': '参团成功', 'price': price})
+        return JsonResponse({'success': True, 'orderid':orderid,'steamid':steamid, 'price': price})
 def buytogether(request):
     openid = request.GET.get('openid', '')
     steamid = request.GET.get('steamid', '')
@@ -301,7 +301,7 @@ def buytogether(request):
             period.cutprice += cutprice
         order.save()
         period.save()
-        return JsonResponse({'success': True, 'reason': '参团成功', 'price': price})
+        return JsonResponse({'success': True, 'orderid':orderid, 'steamid':steamid,'price': price})
     else:
         return JsonResponse({'success': False, 'reason': '团队人数已满'})
 
