@@ -153,11 +153,13 @@ def scancomment(request):
         return JsonResponse({'success': True, 'data': comments})
 def getperiod(request):
     if request.method == 'GET':
-        periodid=request.GET.get('periodid','')
-        period=Period.objects.filter(periodid=periodid).values('production__merchant__logo','production__name', \
-                                                               'number','startprice', \
-                                                               'cutprice')
-        period=serializer(period)
+        orderid=request.GET.get('orderid','')
+        #每期都需要有自己的logo
+        order=Order.objects.filter(orderid=orderid).values('production__merchant__logo','production__name', \
+                                                           'period__number','period__startprice','period__cutprice', \
+                                                           'period__endtime','status')
+
+        period=serializer(order)
         return JsonResponse(period,safe=False)
 
 #查询订单细节
@@ -185,11 +187,10 @@ def orderdetail(request):
     if request.method == 'GET':
         steamid = request.GET.get('steamid', '')
 
-        onecut = Steam.objects.filter(steamid=steamid).values('steamid', 'order__user__picture','order__user__openid',
+        onecut = Steam.objects.filter(steamid=steamid).values('steamid','steamnumber', 'order__user__picture',
                                                               'order__user__name', \
                                                               'order__cutprice')
-        twocut=Cutting.objects.filter(steam_id=steamid).values('steam_id','audience__picture', \
-                                                               'audience__openid','audience__nickname','audience__name','cutprice')
+        twocut=Cutting.objects.filter(steam_id=steamid).values('steam_id','audience__picture','audience__nickname','audience__name','cutprice')
         onecut = serializer(onecut)
         twocut = serializer(twocut)
         return JsonResponse({'onecut': onecut, 'twocut': twocut})
@@ -270,7 +271,7 @@ def buyalone(request):
         order = Order(orderid=orderid, user=user, period=period, status=1, steam=steam, cutprice=price,
                       production=period.production)
         order.save()
-        return JsonResponse({'steamid': steamid, 'reason': '参团成功', 'price': price})
+        return JsonResponse({'success': True, 'reason': '参团成功', 'price': price})
 def buytogether(request):
     openid = request.GET.get('openid', '')
     steamid = request.GET.get('steamid', '')
@@ -300,7 +301,7 @@ def buytogether(request):
             period.cutprice += cutprice
         order.save()
         period.save()
-        return JsonResponse({'success': True, 'steamid': steamid, 'price': price})
+        return JsonResponse({'success': True, 'reason': '参团成功', 'price': price})
     else:
         return JsonResponse({'success': False, 'reason': '团队人数已满'})
 
@@ -311,7 +312,7 @@ def cutprice(request):
     if request.method == 'GET':
         openid=request.GET.get('openid','')
         steamid=request.GET.get('steamid','')
-        periodid=request.GET.get('periodid','')
+        periodid=request.GET.get('period','')
         period=Period.objects.get(periodid=periodid)
         # 差价初值
         initial = period.startprice - period.bottomprice
