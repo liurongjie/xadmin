@@ -103,6 +103,7 @@ class Period(models.Model):
     number = models.IntegerField(default=0,verbose_name="参团人数")
     cutnumber = models.IntegerField(default=0,verbose_name="砍价人次")
     saveprice = models.FloatField(default=0,verbose_name="累计节省")
+    logo = models.ImageField(upload_to="logo", verbose_name="期表商品logo")
     class Meta:
         verbose_name="期表"
         verbose_name_plural = verbose_name
@@ -182,8 +183,12 @@ class Cutting(models.Model):
         verbose_name_plural = verbose_name
 
 
-
-
+class Need(models.Model):
+    needid=models.BigAutoField(primary_key=True)#自增组件字段
+    user=models.ForeignKey(User, on_delete=models.CASCADE,related_name="need")
+    teamname=models.CharField(max_length=50,verbose_name="团队名称")
+    pic=models.ImageField(upload_to="need", verbose_name="需求图片")
+    time = models.DateTimeField( verbose_name="需求提交时间")
 
 
 

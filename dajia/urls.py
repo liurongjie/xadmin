@@ -19,4 +19,6 @@ urlpatterns = [
     path('buyalone', views.buyalone, name='购买'),
     path('buytogether', views.buytogether, name='购买'),
     path('cutprice', views.cutprice, name='我要砍价'),
+    path('need', views.need, name='需求提交'),
+
 ]

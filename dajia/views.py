@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.db.models import Count
 from django.db.models import Max
 from django.db.models import Sum
-from .models import User,Team,Steam,Cutting
+from .models import User,Team,Steam,Cutting,Need
 from .models import Order
 from .models import Comment
 from .models import Period
@@ -33,7 +33,7 @@ def justtry(request):
 
 
 def handle_upload_file(file,filename):
-    path='userpic/'     #上传文件的保存路径，可以自己指定任意的路径
+    path='need/'     #上传文件的保存路径，可以自己指定任意的路径
     if not os.path.exists(path):
         os.makedirs(path)
     with open(path+filename,'wb+')as destination:
@@ -155,7 +155,7 @@ def getperiod(request):
     if request.method == 'GET':
         orderid=request.GET.get('orderid','')
         #每期都需要有自己的logo
-        order=Order.objects.filter(orderid=orderid).values('production__merchant__logo','production__name', \
+        order=Order.objects.filter(orderid=orderid).values('period_id','period__logo','production__name', \
                                                            'period__number','period__startprice','period__cutprice', \
                                                            'period__endtime','status')
 
@@ -167,7 +167,7 @@ def getperiod(request):
 def orderlist(request):
     if request.method == 'GET':
         openid = request.GET.get('openid', '')
-        order=Order.objects.filter(user_id=openid).values('orderid','production__merchant__logo','production__merchant__name','production__name', \
+        order=Order.objects.filter(user_id=openid).values('orderid','period__logo','production__merchant__name','production__name', \
                                                            'production__reputation','period__number','status', \
                                                            'period__endtime','period__starttime', \
                                                           'period_id',
@@ -186,7 +186,6 @@ def orderlist(request):
 def orderdetail(request):
     if request.method == 'GET':
         steamid = request.GET.get('steamid', '')
-
         onecut = Steam.objects.filter(steamid=steamid).values('steamid','steamnumber', 'order__user__picture',
                                                               'order__user__name', \
                                                               'order__cutprice')
@@ -312,7 +311,7 @@ def cutprice(request):
     if request.method == 'GET':
         openid=request.GET.get('openid','')
         steamid=request.GET.get('steamid','')
-        periodid=request.GET.get('period','')
+        periodid=request.GET.get('periodid','')
         period=Period.objects.get(periodid=periodid)
         # 差价初值
         initial = period.startprice - period.bottomprice
@@ -338,6 +337,17 @@ def cutprice(request):
             cutting = Cutting(cutid=cutid, audience=user, steam=steam, cutprice=price)
             cutting.save()
             return JsonResponse({'success': True, 'data': price})
+
+
+def need(request):
+    if request.method =="POST":
+        pic = handle_upload_file(request.FILES['file'], str(request.FILES['file']))
+        openid=request.POST.get('openid')
+        user=User.objects.get(openid=openid)
+        nowtime = timezone.now()
+        teamname=User.team.teamname
+        need=Need(user=user,time=nowtime,teamname=teamname)
+        return JsonResponse({'success': True})
 
 
 
