@@ -1,16 +1,17 @@
 from django.db import models
-
+import uuid
 class Team(models.Model):
-    teamid=models.CharField(max_length=50,primary_key=True,verbose_name="团队id")
-    teamname=models.CharField(max_length=50,verbose_name="团队名称")
+    teamid=models.AutoField(primary_key=True,verbose_name="团队id")
+    teamname=models.CharField(max_length=50,unique=True,verbose_name="团队名称")
     logo=models.ImageField(upload_to="teamlogo",verbose_name="团队logo")
     time = models.DateTimeField(auto_now_add=True, verbose_name="期表创建时间")
     class Meta:
-        verbose_name="团队"
+        verbose_name="大团队"
         verbose_name_plural = verbose_name
         get_latest_by = "time"
 class User(models.Model):
-    openid=models.CharField(max_length=100,primary_key=True,verbose_name="唯一身份标识openid")
+    userid = models.UUIDField(primary_key=True, default=uuid.uuid3(uuid.NAMESPACE_DNS, 'user'), editable=False)
+    openid=models.CharField(max_length=100,unique=True,db_index=True,verbose_name="唯一身份标识openid")#建立索引
     nickname = models.CharField(max_length=30, verbose_name="昵称")
     picture = models.CharField( max_length=150,verbose_name="微信头像")
     CHOICEgender = (
@@ -29,13 +30,14 @@ class User(models.Model):
     telephone=models.CharField(null=True, blank=True,max_length=11,verbose_name="联系方式")
     department=models.CharField(null=True, blank=True,max_length=20,verbose_name="学院")
     team = models.ForeignKey(Team, null=True, blank=True, on_delete=models.SET_NULL,related_name="user")#外键连接名称
+    account=models.IntegerField(default=0,verbose_name="账户贝壳数目")
     class Meta:
         verbose_name="用户"
         verbose_name_plural = verbose_name
 
 
 class Merchant(models.Model):
-    merchantid=models.CharField(primary_key=True,max_length=10,verbose_name="商家id")
+    merchantid=models.BigAutoField(primary_key=True,verbose_name="商家id")
     name=models.CharField(max_length=30,verbose_name="商户名称")
     location = models.CharField(max_length=50, verbose_name="商家位置")
     latitude=models.FloatField(verbose_name="商家纬度")
@@ -57,7 +59,7 @@ class Merchant(models.Model):
         verbose_name_plural = verbose_name
 #不同学校对应不同的产品
 class  Production(models.Model):
-    productionid=models.IntegerField(primary_key=True,verbose_name="产品id")
+    productionid=models.BigAutoField(primary_key=True,verbose_name="产品id")
     team=models.ForeignKey(Team,models.CASCADE,related_name="production")
     merchant=models.ForeignKey(Merchant,on_delete=models.CASCADE,related_name="production")
     name=models.CharField(max_length=20,verbose_name="产品名称")
@@ -71,6 +73,7 @@ class  Production(models.Model):
     introduction=models.CharField(max_length=100,verbose_name="产品文字介绍")
     introductionpic=models.ImageField(upload_to="production",verbose_name="产品图片介绍")
     type = models.IntegerField(choices=CHOICE, verbose_name="产品类别")
+    logo = models.ImageField(upload_to="prologo", verbose_name="产品logo")
     cutnumber = models.IntegerField(default=0,verbose_name="砍价人次")
     saveprice = models.FloatField(default=0,verbose_name="累计节省")
     distance=models.FloatField(verbose_name="距离")
@@ -79,7 +82,7 @@ class  Production(models.Model):
         verbose_name_plural = verbose_name
 
 class Period(models.Model):
-    periodid=models.CharField(primary_key=True,max_length=50,verbose_name="期表id")
+    periodid=models.BigAutoField(primary_key=True,verbose_name="期表id")
     production=models.ForeignKey(Production,on_delete=models.CASCADE,related_name="period")
     starttime=models.DateTimeField(verbose_name="起始时间")
     endtime=models.DateTimeField(verbose_name="结束时间")
@@ -103,28 +106,31 @@ class Period(models.Model):
     number = models.IntegerField(default=0,verbose_name="参团人数")
     cutnumber = models.IntegerField(default=0,verbose_name="砍价人次")
     saveprice = models.FloatField(default=0,verbose_name="累计节省")
-    logo = models.ImageField(upload_to="logo", verbose_name="期表商品logo")
     class Meta:
         verbose_name="期表"
         verbose_name_plural = verbose_name
+        index_together=["status","production"]
 
 
 
 class Steam(models.Model):
-    steamid=models.CharField(max_length=50,primary_key=True,verbose_name="拼团小团队id")
-    time = models.DateTimeField(auto_now_add=True, verbose_name="团队创建时间")
+    steamid=models.BigAutoField(max_length=50,primary_key=True,verbose_name="拼团小团队id")
     cutprice=models.FloatField(verbose_name="团队整体优惠价格")
     steamnumber=models.IntegerField(verbose_name="团队人数")
     master=models.ForeignKey(User,null=True, blank=True, on_delete=models.SET_NULL,related_name="steam")
+    time = models.DateTimeField(auto_now_add=True, verbose_name="团队创建时间")
     class Meta:
         verbose_name="小团"
         verbose_name_plural = verbose_name
 
 class Comment(models.Model):
-    commentid=models.CharField(max_length=150,primary_key=True,verbose_name="评论id")
+    commentid=models.BigAutoField(primary_key=True,verbose_name="评论id")
     production=models.ForeignKey(Production,on_delete=models.CASCADE,related_name="comment")
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="comment")
     context=models.CharField(max_length=200,verbose_name="评论")
+    pic1 = models.ImageField(upload_to="comment", null=True, blank=True, verbose_name="评论图片1")
+    pic2 = models.ImageField(upload_to="comment",null=True, blank=True,  verbose_name="评论图片2")
+    pic3 = models.ImageField(upload_to="comment", null=True, blank=True, verbose_name="评论图片3")
     time=models.DateTimeField(auto_now_add=True,verbose_name="评论时间")
     CHOICEJudge = (
         (1, "非常不满意"),
@@ -142,11 +148,12 @@ class Comment(models.Model):
     class Meta:
         verbose_name="评论"
         verbose_name_plural = verbose_name
+        index_together=["production","status"]
 
 
 
 class Order(models.Model):
-    orderid=models.CharField(max_length=50,primary_key=True,verbose_name="订单编号")
+    orderid=models.BigAutoField(primary_key=True,verbose_name="订单编号")
     user=models.ForeignKey(User,on_delete=models.CASCADE,related_name="order")
     period=models.ForeignKey(Period,on_delete=models.CASCADE,related_name="order")
     production=models.ForeignKey(Production,on_delete=models.CASCADE,related_name="order")
@@ -173,7 +180,7 @@ class Order(models.Model):
         verbose_name_plural = verbose_name
 
 class Cutting(models.Model):
-    cutid=models.CharField(primary_key=True,max_length=150,verbose_name="砍价编号")
+    cutid=models.BigAutoField(primary_key=True,verbose_name="砍价编号")
     audience = models.ForeignKey(User, on_delete=models.CASCADE,related_name="cutting")
     steam=models.ForeignKey(Steam,on_delete=models.CASCADE,related_name="cutting")
     cutprice=models.FloatField(verbose_name="砍价")
@@ -181,16 +188,22 @@ class Cutting(models.Model):
     class Meta:
         verbose_name="砍价"
         verbose_name_plural = verbose_name
+        index_together = ["audience", "steam"]
 
 
 class Need(models.Model):
-    needid=models.BigAutoField(primary_key=True)#自增组件字段
+    needid=models.BigAutoField(primary_key=True,verbose_name="需求编号")#自增组件字段
     user=models.ForeignKey(User, on_delete=models.CASCADE,related_name="need")
     teamname=models.CharField(max_length=50,verbose_name="团队名称")
     pic=models.ImageField(upload_to="need", verbose_name="需求图片")
-    time = models.DateTimeField( verbose_name="需求提交时间")
+    time = models.DateTimeField(auto_now_add=True,  verbose_name="需求提交时间")
 
-
+class Suggestion(models.Model):
+    id=models.BigAutoField(primary_key=True,verbose_name="意见编号")#自增组件字段
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="suggestion")
+    teamname = models.CharField(max_length=50, verbose_name="团队名称")
+    pic = models.ImageField(upload_to="need", verbose_name="意见图片")
+    time = models.DateTimeField(auto_now_add=True, verbose_name="需求提交时间")
 
 
 # Create your models here.

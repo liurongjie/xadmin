@@ -1,6 +1,6 @@
 import xadmin
 from xadmin import views
-from .models import Team,User,Merchant,Production,Period,Steam,Comment,Order,Cutting
+from .models import Team,User,Merchant,Production,Period,Steam,Comment,Order,Cutting,Need,Suggestion
 # 创建xadmin的最基本管理器配置，并与view绑定
 class BaseSetting(object):
     # 开启主题功能
@@ -25,9 +25,9 @@ class Teamxadmin(object):
 xadmin.site.register(Team,Teamxadmin)
 
 class Userxadmin(object):
-    list_display = {'openid', 'nickname', 'picture','gender', 'status','number','telephone','department','team','name'}
+    list_display = {'userid','openid', 'nickname', 'picture','gender', 'status','number','telephone','department','team','name'}
     search_fields = {'team__teamname','nickname'}
-    list_filter = {'gender','status'}
+    list_filter = {'gender','status','team__teamname'}
 xadmin.site.register(User,Userxadmin)
 
 class Merchantxadmin(object):
@@ -58,7 +58,7 @@ xadmin.site.register(Steam,Steamxadmin)
 
 
 class Commentxadmin(object):
-    list_display = {'commentid','production','user','context','time','status','judge'}
+    list_display = {'commentid','production','user','context','time','pic1','pic2','pic3''status','judge'}
     search_fields = {'production__name','user__name'}
     list_filter = {'status','judge'}
 xadmin.site.register(Comment,Commentxadmin)
@@ -76,3 +76,14 @@ class Cuttingxadmin(object):
     list_filter = {'cutprice'}
 xadmin.site.register(Cutting,Cuttingxadmin)
 
+class Needxadmin(object):
+    list_display = {'needid','user','teamname','pic','time'}
+    search_fields = {'teamname'}
+    list_filter = {}
+xadmin.site.register(Need,Needxadmin)
+
+class Suggestionxadmin(object):
+    list_display = {'id','user','teamname','pic','time'}
+    search_fields = {'teamname'}
+    list_filter = {}
+xadmin.site.register(Suggestion,Suggestionxadmin)

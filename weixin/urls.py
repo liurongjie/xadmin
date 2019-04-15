@@ -22,4 +22,5 @@ import xadmin
 urlpatterns = [
 path('xadmin/', xadmin.site.urls),
 path('dajia/',include('dajia.urls')),
+path('silk/',include('silk.urls'))
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
