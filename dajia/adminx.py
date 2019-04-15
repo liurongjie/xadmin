@@ -25,7 +25,7 @@ class Teamxadmin(object):
 xadmin.site.register(Team,Teamxadmin)
 
 class Userxadmin(object):
-    list_display = {'userid','openid', 'nickname', 'picture','gender', 'status','number','telephone','department','team','name'}
+    list_display = {'userid','openid', 'nickname', 'picture','gender', 'status','number','telephone','department','team','name','account'}
     search_fields = {'team__teamname','nickname'}
     list_filter = {'gender','status','team__teamname'}
 xadmin.site.register(User,Userxadmin)
@@ -37,7 +37,7 @@ class Merchantxadmin(object):
 xadmin.site.register(Merchant,Merchantxadmin)
 
 class Productionxadmin(object):
-    list_display = {'productionid','team','merchant','name','reputation','introduction','introductionpic','type','cutnumber','saveprice'}
+    list_display = {'productionid','team','merchant','name','reputation','introduction','introductionpic','type','cutnumber','saveprice','logo'}
     search_fields = {'team__name','merchant__name'}
     list_filter = {'type'}
 xadmin.site.register(Production,Productionxadmin)

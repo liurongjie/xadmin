@@ -2,13 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b8b7f819-22c7-4f44-8bff-e8296afdc948" name="Default Changelist" comment="new">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dajia/adminx.py" beforeDir="false" afterPath="$PROJECT_DIR$/dajia/adminx.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dajia/migrations/0001_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dajia/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/dajia/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dajia/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/dajia/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/weixin/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/weixin/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/weixin/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/weixin/urls.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -111,13 +106,13 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="dummy" value="6" />
-          <entry key="py" value="6336" />
+          <entry key="py" value="6355" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="6" />
-          <entry key="Python" value="6336" />
+          <entry key="Python" value="6355" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -136,14 +131,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dajia/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="281">
-              <caret line="333" column="69" selection-start-line="333" selection-start-column="69" selection-end-line="333" selection-end-column="69" />
+            <state relative-caret-position="376">
+              <caret line="336" lean-forward="true" selection-start-line="336" selection-end-line="336" />
               <folding>
                 <element signature="e#0#35#0" expanded="true" />
-                <marker date="1555326575768" expanded="true" signature="6471:7007" ph="..." />
+                <marker date="1555329145442" expanded="true" signature="6471:7007" ph="..." />
               </folding>
             </state>
           </provider>
@@ -172,17 +167,17 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/dajia/adminx.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="190">
-              <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
+            <state relative-caret-position="91">
+              <caret line="59" column="28" lean-forward="true" selection-start-line="59" selection-start-column="28" selection-end-line="59" selection-end-column="28" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
-                <marker date="1555317684166" expanded="true" signature="302:537" ph="..." />
-                <marker date="1555317684166" expanded="true" signature="562:567" ph="..." />
-                <marker date="1555317684166" expanded="true" signature="740:745" ph="..." />
-                <marker date="1555317684166" expanded="true" signature="1043:1048" ph="..." />
+                <marker date="1555329185400" expanded="true" signature="302:537" ph="..." />
+                <marker date="1555329185400" expanded="true" signature="562:567" ph="..." />
+                <marker date="1555329185400" expanded="true" signature="740:745" ph="..." />
+                <marker date="1555329185400" expanded="true" signature="1053:1058" ph="..." />
               </folding>
             </state>
           </provider>
@@ -270,9 +265,9 @@
         <option value="$PROJECT_DIR$/dajia/urls.py" />
         <option value="$PROJECT_DIR$/weixin/urls.py" />
         <option value="$PROJECT_DIR$/weixin/settings.py" />
-        <option value="$PROJECT_DIR$/dajia/adminx.py" />
         <option value="$PROJECT_DIR$/dajia/models.py" />
         <option value="$PROJECT_DIR$/dajia/views.py" />
+        <option value="$PROJECT_DIR$/dajia/adminx.py" />
       </list>
     </option>
   </component>
@@ -433,12 +428,12 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.11394102" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.11394102" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.8699732" weight="0.30070922" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.8699732" visible="true" weight="0.30070922" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49932975" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -447,7 +442,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.32907802" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.1300268" side_tool="true" weight="0.04249292" />
-      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.48123324" visible="true" weight="0.2609929" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.48123324" weight="0.2609929" />
       <window_info anchor="bottom" id="Python Console" order="12" sideWeight="0.49396783" weight="0.19858156" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -596,20 +591,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dajia/adminx.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="19" lean-forward="true" selection-start-line="19" selection-end-line="19" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-            <marker date="1555317684166" expanded="true" signature="302:537" ph="..." />
-            <marker date="1555317684166" expanded="true" signature="562:567" ph="..." />
-            <marker date="1555317684166" expanded="true" signature="740:745" ph="..." />
-            <marker date="1555317684166" expanded="true" signature="1043:1048" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/dajia/tests.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -634,11 +615,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/dajia/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="281">
-          <caret line="333" column="69" selection-start-line="333" selection-start-column="69" selection-end-line="333" selection-end-column="69" />
+        <state relative-caret-position="376">
+          <caret line="336" lean-forward="true" selection-start-line="336" selection-end-line="336" />
           <folding>
             <element signature="e#0#35#0" expanded="true" />
-            <marker date="1555326575768" expanded="true" signature="6471:7007" ph="..." />
+            <marker date="1555329145442" expanded="true" signature="6471:7007" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dajia/adminx.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="91">
+          <caret line="59" column="28" lean-forward="true" selection-start-line="59" selection-start-column="28" selection-end-line="59" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+            <marker date="1555329185400" expanded="true" signature="302:537" ph="..." />
+            <marker date="1555329185400" expanded="true" signature="562:567" ph="..." />
+            <marker date="1555329185400" expanded="true" signature="740:745" ph="..." />
+            <marker date="1555329185400" expanded="true" signature="1053:1058" ph="..." />
           </folding>
         </state>
       </provider>
