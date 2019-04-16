@@ -33,10 +33,11 @@ def justtry(request):
 
 
 def handle_upload_file(file,filename,path):
+    allpath = 'uploads/'+path
     #上传文件的保存路径，可以自己指定任意的路径
-    if not os.path.exists(path):
-        os.makedirs(path)
-    with open(path+filename,'wb+')as destination:
+    if not os.path.exists(allpath):
+        os.makedirs(allpath)
+    with open(allpath+filename,'wb+')as destination:
         for chunk in file.chunks():
             destination.write(chunk)
     return path+filename
@@ -158,7 +159,7 @@ def getperiod(request):
 def orderlist(request):
     if request.method == 'GET':
         userid = request.GET.get('userid', '')
-        order=Order.objects.filter(user_id=userid).select_related("production","period","steam").values('orderid','production__logo','production__name', \
+        order=Order.objects.filter(user_id=userid).values('orderid','production__logo','production__name', \
                                                            'production__reputation','period__number','status', \
                                                            'period__endtime','period__starttime', \
                                                           'period_id',
@@ -177,9 +178,8 @@ def orderlist(request):
 def orderdetail(request):
     if request.method == 'GET':
         steamid = request.GET.get('steamid', '')
-        onecut = Steam.objects.filter(steamid=steamid).values('member__name', "member__picture", \
+        onecut = Steam.objects.filter(steamid=steamid).values('member__userid','member__name', "member__picture", \
                                                               "membership__cutprice", "membership__time")
-
         twocut=Cutting.objects.filter(steamid=steamid).select_related("audience").values('audience__picture','audience__nickname','audience__name','cutprice')
         onecut = serializer(onecut)
         twocut = serializer(twocut)
@@ -199,6 +199,7 @@ def cancel(request):
         return JsonResponse({'success':True})
 #评论
 #验证成功
+#立即靠岸
 def completeorder(request):
     if request.method=='GET':
         orderid=request.GET.get('orderid','')
@@ -211,10 +212,10 @@ def completeorder(request):
 
 
 def comment(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
         path = 'comment/'
         pic = handle_upload_file(request.FILES['file'], str(request.FILES['file']), path)
-        orderid=request.GET.get('orderid','')
+        orderid=request.POST.get('orderid','')
         order=Order.objects.get(orderid=orderid)
         comment=order.comment
         if comment:
@@ -230,10 +231,10 @@ def comment(request):
                 comment.pic3=pic
                 comment.save()
                 return JsonResponse({'success':'pic3'})
-
+            return JsonResponse({'success': False})
         else:
-            context = request.GET.get('context', '')
-            judge = request.GET.get('judge', '')
+            context = request.POST.get('context', '')
+            judge = request.POST.get('judge', '')
             commenModel=Comment(context=context,user=order.user,status=0, \
                                 production=order.production,judge=judge,pic1=pic)
             nowtime = timezone.now()
@@ -317,24 +318,27 @@ def cutprice(request):
         initial = period.startprice - period.bottomprice
         user=User.objects.get(userid=userid)
         steam=Steam.objects.get(steamid=steamid)
+
         if steam.cutprice<=0.7:
             price=random.randint(int(0.1*initial),int(0.7*initial))
         elif steam.cutprice<=0.8:
             price = random.randint(int(0.05 * initial), int(0.3 * initial))
         else:
             price = random.randint(int(0.01 * initial), int(0.1 * initial))
+
         price=price/100
         period.cutprice+=price
         period.cutnumber=period.cutnumber+1
         period.save()
         judge=Cutting.objects.filter(steamid=steamid,audience_id=userid).exists()
+
         if judge:
             return JsonResponse({'success': False})
         else:
             steam.cutprice += price
             steam.save()
-            cutting=Cutting.objects.create(audience=user, steam=steam, cutprice=price)
-            return JsonResponse({'success': True, 'data': price})
+            cutting=Cutting.objects.create(audience=user,steamid=steamid, cutprice=price)
+            return JsonResponse({'success': True, 'price': price})
 
 
 def need(request):
@@ -347,6 +351,8 @@ def need(request):
         teamname=User.team.teamname
         Need.objects.create(user=user,time=nowtime,teamname=teamname)
         return JsonResponse({'success': True})
+
+
 
 
 

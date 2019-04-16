@@ -192,7 +192,7 @@ class Order(models.Model):
     time4 = models.DateTimeField(null=True, blank=True, verbose_name="订单完成时间")
     time5 = models.DateTimeField(null=True, blank=True, verbose_name="评价完成时间")
     time6=models.DateTimeField(null=True, blank=True, verbose_name="订单取消时间")
-    comment=models.ForeignKey(Comment,on_delete=models.CASCADE,related_name="order",null=True, blank=True)
+    comment=models.ForeignKey(Comment,on_delete=models.SET_NULL,related_name="order",null=True, blank=True)
     class Meta:
         db_table = "Order"
         verbose_name="订单"
@@ -226,12 +226,20 @@ class Suggestion(models.Model):
     id=models.BigAutoField(primary_key=True,verbose_name="意见编号")#自增组件字段
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="suggestion")
     teamname = models.CharField(max_length=50, verbose_name="团队名称")
-    pic = models.ImageField(upload_to="need", verbose_name="意见图片")
+    pic = models.ImageField(upload_to="suggetion", verbose_name="意见图片")
     time = models.DateTimeField(auto_now_add=True, verbose_name="需求提交时间")
     class Meta:
         db_table = "Suggestion"
         verbose_name = "意见"
         verbose_name_plural = verbose_name
+class Gift(models.Model):
+    id=models.AutoField(primary_key=True,verbose_name="小礼品id")
+    name=models.CharField(max_length=20,verbose_name="小礼品名称")
+    worth=models.SmallIntegerField(verbose_name="价值贝壳数量")
+    pic = models.ImageField(upload_to="gift", verbose_name="礼品图片")
+    time=models.DateTimeField(auto_now_add=True,verbose_name="礼品创立时间")
+
+
 
 
 # Create your models here.
