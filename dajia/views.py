@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.db.models import Count
 from django.db.models import Max
 from django.db.models import Sum
-from .models import User,Team,Steam,Cutting,Need
+from .models import User,Team,Steam,Cutting,Need,Membership
 from .models import Order
 from .models import Comment
 from .models import Period
@@ -24,16 +24,16 @@ import  time
 
 def justtry(request):
     if request.method == 'GET':
-        nowtime = timezone.now()
-        periods = Period.objects.filter(status=2, starttime__lte=nowtime).all()
-        for period in periods:
-            period.status = 1
-            period.save()
+        steamid=request.GET.get('steamid')
+        member=Steam.objects.filter(steamid=steamid).values('member__name',"member__picture", \
+                                                            "membership__cutprice","membership__time")
+        member=serializer(member)
+        print(member)
         return JsonResponse({"success":True})
 
 
-def handle_upload_file(file,filename):
-    path='need/'     #上传文件的保存路径，可以自己指定任意的路径
+def handle_upload_file(file,filename,path):
+    #上传文件的保存路径，可以自己指定任意的路径
     if not os.path.exists(path):
         os.makedirs(path)
     with open(path+filename,'wb+')as destination:
@@ -98,7 +98,7 @@ def home(request):
     if request.method == 'GET':
         pass
         teamid=request.GET.get('teamid','')
-        maindata=Period.objects.filter(production__team_id=teamid,status=1).values('periodid','production','production__name', \
+        maindata=Period.objects.filter(production__team_id=teamid,status=1).select_related('production','production__merchant').values('periodid','production','production__name', \
                                                                                    'production__introduction','production__introductionpic',\
                                                                                'startprice','starttime','endtime','type', \
                                                                                'production__merchant__location',\
@@ -106,7 +106,7 @@ def home(request):
                                                                                'number','cutnumber','saveprice','production__merchant__pic1', \
                                                                                    'cutprice',
                                                                                    'production__merchant__pic2' \
-                                                                                   ,'production__reputation','production__merchant__pic3').select_related('production','production__merchant')
+                                                                                   ,'production__reputation','production__merchant__pic3')
         maindata=serializer(maindata)
         return JsonResponse(maindata,safe=False)
 
@@ -118,9 +118,9 @@ def home(request):
 def firstcomment(request):
     if request.method == 'GET':
         productionid = request.GET.get('productionid', '')
-        data=Comment.objects.filter(production_id=productionid,status=1).values( 'context','user__name', \
+        data=Comment.objects.filter(production_id=productionid,status=1).select_related('user','user__team').values( 'context','user__name', \
                                                                                  'user__department','user__picture', \
-                                                                                 'user__team__teamname','time').select_related('user','user__team').all()[0:15]
+                                                                                 'user__team__teamname','time').all()[0:15]
         data=serializer(data)
         return JsonResponse({'success': True, 'data': data})
 
@@ -141,11 +141,12 @@ def scancomment(request):
                                                                                                                       "user__team").all()[number:number+5]
         comments = serializer(comments)
         return JsonResponse({'success': True, 'data': comments})
+#查看我的团和分享页展示内容
 def getperiod(request):
     if request.method == 'GET':
         orderid=request.GET.get('orderid','')
         #每期都需要有自己的logo
-        order=Order.objects.filter(orderid=orderid).values('period_id','period__logo','production__name', \
+        order=Order.objects.filter(orderid=orderid).select_related('period','production').values('period_id','period__logo','production__name', \
                                                            'period__number','period__startprice','period__cutprice', \
                                                            'period__endtime','status').select_related("period","production")
 
@@ -156,16 +157,15 @@ def getperiod(request):
 #接口正常运行，细节的雕琢
 def orderlist(request):
     if request.method == 'GET':
-        openid = request.GET.get('openid', '')
-        order=Order.objects.filter(user_id=openid).values('orderid','production__logo','production__name', \
+        userid = request.GET.get('userid', '')
+        order=Order.objects.filter(user_id=userid).select_related("production","period","steam").values('orderid','production__logo','production__name', \
                                                            'production__reputation','period__number','status', \
                                                            'period__endtime','period__starttime', \
                                                           'period_id',
                                                            'period__startprice','period__cutprice', \
                                                           'steam_id','steam__cutprice', \
                                                           'production__team__teamname','production__distance', \
-                                                          'time1','time2','time3','time4','time5','time6').select_related("production", \
-                                                                                                                          "period","steam")
+                                                          'time1','time2','time3','time4','time5','time6')
         if order:
             order = serializer(order)
             return JsonResponse({"response":True,"period": order})
@@ -177,10 +177,10 @@ def orderlist(request):
 def orderdetail(request):
     if request.method == 'GET':
         steamid = request.GET.get('steamid', '')
-        onecut = Steam.objects.filter(steamid=steamid).values('steamid','steamnumber', 'order__user__picture',
-                                                              'order__user__name', \
-                                                              'order__cutprice').select_related("order")
-        twocut=Cutting.objects.filter(steam_id=steamid).values('steam_id','audience__picture','audience__nickname','audience__name','cutprice').select_related("audience")
+        onecut = Steam.objects.filter(steamid=steamid).values('member__name', "member__picture", \
+                                                              "membership__cutprice", "membership__time")
+
+        twocut=Cutting.objects.filter(steamid=steamid).select_related("audience").values('audience__picture','audience__nickname','audience__name','cutprice')
         onecut = serializer(onecut)
         twocut = serializer(twocut)
         return JsonResponse({'onecut': onecut, 'twocut': twocut})
@@ -212,20 +212,30 @@ def completeorder(request):
 
 def comment(request):
     if request.method == 'GET':
+        path = 'comment/'
+        pic = handle_upload_file(request.FILES['file'], str(request.FILES['file']), path)
         orderid=request.GET.get('orderid','')
-        context=request.GET.get('context','')
-        judge=request.GET.get('judge','')
         order=Order.objects.get(orderid=orderid)
-        user=order.user
-        commentid=user.openid+order.period_id
-        judge=Comment.objects.filter(commentid=commentid).exists()
-        if judge:
-            comment1=Comment.objects.get(commentid=commentid)
-            comment1.context=context
-            comment1.save()
+        comment=order.comment
+        if comment:
+            if not comment.pic1:
+                comment.pic1=pic
+                comment.save()
+                return JsonResponse({'success': 'pic1'})
+            elif not comment.pic2:
+                comment.pic2 = pic
+                comment.save()
+                return JsonResponse({'success': 'pic2'})
+            elif not comment.pic3:
+                comment.pic3=pic
+                comment.save()
+                return JsonResponse({'success':'pic3'})
+
         else:
-            commenModel=Comment(commentid=commentid,context=context,user=user,order=order,status=0, \
-                                production=order.production,judge=judge)
+            context = request.GET.get('context', '')
+            judge = request.GET.get('judge', '')
+            commenModel=Comment(context=context,user=order.user,status=0, \
+                                production=order.production,judge=judge,pic1=pic)
             nowtime = timezone.now()
             commenModel.save()
             order.time5 = nowtime
@@ -240,6 +250,7 @@ def buyalone(request):
         periodid = request.GET.get('periodid', '')
         period = Period.objects.get(periodid=periodid)
         user = User.objects.get(userid=userid)
+
         now = datetime.datetime.now()
         initial=period.startprice-period.bottomprice
         price = random.randint(int(0.1*initial), int(0.14*initial))  # 砍价金额
@@ -256,7 +267,8 @@ def buyalone(request):
             cutprice = 0.001 * initial
             period.cutprice += cutprice
         period.save()
-        steam = Steam.objects.create(cutprice=price, steamnumber=1, master=user)
+        steam = Steam.objects.create(cutprice=price, steamnumber=1)
+        membership=Membership.objects.create(user=user,steam=steam,cutprice=cutprice)
         order = Order.objects.create( user=user, period=period, status=1, steam=steam, cutprice=price,
                       production=period.production)
         return JsonResponse({'success': True, 'orderid':order.orderid,'steamid':steam.steamid, 'price': price})
@@ -273,7 +285,7 @@ def buytogether(request):
     initial = period.startprice - period.bottomprice
     price = random.randint(int(0.1 * initial), int(0.14 * initial))  # 砍价金额
     steam = Steam.objects.get(steamid=steamid)
-    if steam.steamnumber <= 4:
+    if steam.steamnumber < 5:
         period.cutnumber = period.cutnumber + 1
         period.saveprice += price
         period.save()
@@ -286,6 +298,7 @@ def buytogether(request):
             period.cutprice += cutprice
         order = Order.objects.create(user=user, period=period, status=1, steam=steam, cutprice=price,
                                      production=period.production)
+        membership = Membership.objects.create(user=user, steam=steam, cutprice=price)
         period.save()
         return JsonResponse({'success': True, 'orderid':order.orderid, 'steamid':steamid,'price': price})
     else:
@@ -314,7 +327,7 @@ def cutprice(request):
         period.cutprice+=price
         period.cutnumber=period.cutnumber+1
         period.save()
-        judge=Cutting.objects.filter(steam_id=steamid,audience_id=userid).exists()
+        judge=Cutting.objects.filter(steamid=steamid,audience_id=userid).exists()
         if judge:
             return JsonResponse({'success': False})
         else:
@@ -326,7 +339,8 @@ def cutprice(request):
 
 def need(request):
     if request.method =="POST":
-        pic = handle_upload_file(request.FILES['file'], str(request.FILES['file']))
+        path = 'need/'
+        pic = handle_upload_file(request.FILES['file'], str(request.FILES['file']),path)
         userid=request.POST.get('userid',"")
         user=User.objects.get(userid=userid)
         nowtime = timezone.now()

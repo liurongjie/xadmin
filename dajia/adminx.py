@@ -1,6 +1,6 @@
 import xadmin
 from xadmin import views
-from .models import Team,User,Merchant,Production,Period,Steam,Comment,Order,Cutting,Need,Suggestion
+from .models import Team,User,Merchant,Production,Period,Steam,Comment,Order,Cutting,Need,Suggestion,Membership
 # 创建xadmin的最基本管理器配置，并与view绑定
 class BaseSetting(object):
     # 开启主题功能
@@ -51,14 +51,19 @@ xadmin.site.register(Period,Periodxadmin)
 
 
 class Steamxadmin(object):
-    list_display = {'steamid','time','cutprice','steamnumber','master'}
-    search_fields = {'steamid','master__name'}
+    list_display = {'steamid','time','cutprice','steamnumber','member'}
+    search_fields = {'steamid'}
     list_filter = {'cutprice'}
 xadmin.site.register(Steam,Steamxadmin)
 
+class Memberxadmin(object):
+    list_display = {'id','user','steam','cutprice','time'}
+    search_fields = {'user__name'}
+
+xadmin.site.register(Membership,Memberxadmin)
 
 class Commentxadmin(object):
-    list_display = {'commentid','production','user','context','time','pic1','pic2','pic3''status','judge'}
+    list_display = {'commentid','production','user','context','time','pic1','pic2','pic3','status','judge'}
     search_fields = {'production__name','user__name'}
     list_filter = {'status','judge'}
 xadmin.site.register(Comment,Commentxadmin)
