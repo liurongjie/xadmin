@@ -31,7 +31,9 @@ class User(models.Model):
     telephone=models.CharField(null=True, blank=True,max_length=11,verbose_name="联系方式")
     department=models.CharField(null=True, blank=True,max_length=20,verbose_name="学院")
     team = models.ForeignKey(Team, null=True, blank=True, on_delete=models.SET_NULL,related_name="user")#外键连接名称
+    parentuser=models.ForeignKey('self',null=True, blank=True, on_delete=models.SET_NULL,related_name="puser")#链接向自己的邀请人
     account=models.IntegerField(default=0,verbose_name="账户贝壳数目")
+    time = models.DateTimeField(auto_now=True, verbose_name="实名认证时间")
     class Meta:
         db_table = "User"
         verbose_name="用户"
@@ -128,7 +130,7 @@ class Comment(models.Model):
     pic1 = models.ImageField(upload_to="comment", null=True, blank=True, verbose_name="评论图片1")
     pic2 = models.ImageField(upload_to="comment",null=True, blank=True,  verbose_name="评论图片2")
     pic3 = models.ImageField(upload_to="comment", null=True, blank=True, verbose_name="评论图片3")
-    time=models.DateTimeField(auto_now_add=True,verbose_name="评论时间")
+
     CHOICEJudge = (
         (1, "非常不满意"),
         (2, "不满意"),
@@ -136,17 +138,21 @@ class Comment(models.Model):
         (4, "满意"),
         (5, "非常满意"),
     )
-    judge=models.IntegerField(choices=CHOICEJudge,verbose_name="评价")
+    judge1=models.IntegerField(choices=CHOICEJudge,verbose_name="对商品评价")
+    judge2 = models.IntegerField(choices=CHOICEJudge, verbose_name="对BOAT评价")
     CHOICE = (
         (0, "未核查"),
         (1, "已核查"),
     )
-    status=models.IntegerField(default=0,choices=CHOICE,verbose_name="是否审核")
+    status=models.SmallIntegerField(default=0,choices=CHOICE,verbose_name="是否审核")
+    time = models.DateTimeField(auto_now_add=True, verbose_name="评论时间")
     class Meta:
         db_table = "Comment"
         verbose_name="评论"
         verbose_name_plural = verbose_name
         index_together=["production","status"]
+        ordering = ['-time']
+
 
 class Steam(models.Model):
     steamid=models.BigAutoField(primary_key=True,verbose_name="拼团小团队id")
@@ -186,6 +192,8 @@ class Order(models.Model):
     )
     status=models.IntegerField(choices=CHOICE,default=1,verbose_name="状态")
     cutprice=models.FloatField(verbose_name="参团成员砍价")
+    endprice=models.FloatField(default=0,verbose_name="最终价格")
+    gain = models.SmallIntegerField(default=0,verbose_name="付款所得")
     time1 = models.DateTimeField(auto_now_add=True, verbose_name="预付完成时间")
     time2 = models.DateTimeField(null=True, blank=True, verbose_name="拼团完成时间")
     time3 = models.DateTimeField(null=True, blank=True, verbose_name="支付完成时间")
@@ -238,6 +246,38 @@ class Gift(models.Model):
     worth=models.SmallIntegerField(verbose_name="价值贝壳数量")
     pic = models.ImageField(upload_to="gift", verbose_name="礼品图片")
     time=models.DateTimeField(auto_now_add=True,verbose_name="礼品创立时间")
+    class Meta:
+        db_table = "Gift"
+        verbose_name = "摇奖"
+        verbose_name_plural = verbose_name
+
+class Giftorder(models.Model):
+    id=models.BigAutoField(primary_key=True,verbose_name="礼品定义")
+    user=models.ForeignKey(User,on_delete=models.CASCADE,verbose_name="购买者")
+    gift=models.ForeignKey(Gift,on_delete=models.CASCADE,verbose_name="礼物")
+    CHOICE = (
+        (0, '未处理'),
+        (1, "已处理"),
+    )
+    status = models.SmallIntegerField(default=0, choices=CHOICE, verbose_name="是否处理")
+    time = models.DateTimeField(auto_now_add=True, verbose_name="礼品创立时间")
+    class Meta:
+        db_table = "Giftorder"
+        verbose_name = "礼品订单"
+        verbose_name_plural = verbose_name
+
+class Sign(models.Model):
+    id=models.BigAutoField(primary_key=True,verbose_name="签到id")
+    userid = models.IntegerField(verbose_name='签到者用户id')
+    gain=models.IntegerField(verbose_name="签到所得")
+    time=models.DateField(auto_now_add=True,verbose_name="时间")
+    class Meta:
+        unique_together=["userid","time"]
+        db_table = "Sign"
+        verbose_name = "登陆所得"
+        verbose_name_plural = verbose_name
+
+
 
 
 

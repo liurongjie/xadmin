@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.db.models import Count
 from django.db.models import Max
 from django.db.models import Sum
-from .models import User,Team,Steam,Cutting,Need,Membership
+from .models import User,Team,Steam,Cutting,Need,Membership,Sign,Giftorder,Gift
 from .models import Order
 from .models import Comment
 from .models import Period
@@ -19,6 +19,7 @@ import requests
 import json
 import random
 import datetime
+import uuid
 import  time
 
 
@@ -64,13 +65,17 @@ def login(request):
         openid = response['openid']
         account = User.objects.filter(openid=openid).exists()
         if account:
+
             newaccount = User.objects.get(openid=openid)
             if newaccount.status == 0:
                 return JsonResponse({"userid": newaccount.userid,"status":0})
             else:
-                return JsonResponse({"userid": newaccount.userid,"name":newaccount.name,"team_name":newaccount.team.teamname,"number":newaccount.number[0:4],"status":1})
+                return JsonResponse({"userid": newaccount.userid,"name":newaccount.name, \
+                                     "team_name":newaccount.team.teamname, \
+                                     "account":newaccount.account,"number":newaccount.number[0:4],"status":1})
 
         else:
+
             newaccount=User.objects.create(openid=openid, nickname=nickname, picture=pic, gender=gender, status=0)
             return JsonResponse({"userid":newaccount.userid,"status":0})
 
@@ -81,16 +86,33 @@ def login(request):
 #已注册返回该账户已注册
 def verify(request):
     if request.method == 'GET':
-        userid=request.GET.get('userid','')#openid
-        teamid=request.GET.get('teamid','')#teamid
-        name = request.GET.get('name', '')#姓名
+        puserid=request.GET.get('puserid','')
+        userid = request.GET.get('userid', '')  # openid
+        teamid = request.GET.get('teamid', '')  # teamid
+        name = request.GET.get('name', '')  # 姓名
         number = request.GET.get('number', '')  # 学号
-        department = request.GET.get('department', '')#院系
+        department = request.GET.get('department', '')  # 院系
         telephone = request.GET.get('telephone', '')  # 电话号码
         team = Team.objects.get(teamid=teamid)
-        User.objects.filter(userid=userid).update(name=name,number=number,department=department,telephone=telephone,status=1,team=team)
-        return JsonResponse({"userid": userid, "name": name, "team_name": team.teamname,
-                             "number": number[0:4], "status": 1})
+        if User.objects.filter(userid=userid,status=1):
+            return JsonResponse({"userid": userid, "name": name, "team_name": team.teamname,
+                                 "number": number[0:4], "status": 1, 'account': 50})
+        else:
+            if (puserid):
+                P_User = User.objects.get(userid=puserid)
+                P_User.account += 30
+                P_User.save()  # 邀请人加上30贝壳
+                User.objects.filter(userid=userid).update(name=name, number=number, department=department,
+                                                          telephone=telephone, status=1, team=team, parentuser=P_User,account=50)
+                return JsonResponse({"userid": userid, "name": name, "team_name": team.teamname,
+                                     "number": number[0:4], "status": 1, 'account': 50})
+            else:
+                User.objects.filter(userid=userid).update(name=name, number=number, department=department,
+                                                          telephone=telephone, status=1, team=team,account=50)
+                return JsonResponse({"userid": userid, "name": name, "team_name": team.teamname,
+                                     "number": number[0:4], "status": 1, 'account': 50})
+
+
 
 
 #home页boat组件的信息获取
@@ -121,7 +143,7 @@ def firstcomment(request):
         productionid = request.GET.get('productionid', '')
         data=Comment.objects.filter(production_id=productionid,status=1).select_related('user','user__team').values( 'context','user__name', \
                                                                                  'user__department','user__picture', \
-                                                                                 'user__team__teamname','time').all()[0:15]
+                                                                                 'user__team__teamname','time','pic1','pic2','pic3').all()[0:50]
         data=serializer(data)
         return JsonResponse({'success': True, 'data': data})
 
@@ -135,11 +157,11 @@ def scancomment(request):
         number=int(number)
         periodid = request.GET.get('periodid', '')
         period = Period.objects.get(periodid=periodid)
-        comments = Comment.objects.filter(production_id=period.production_id, status=1).values("user__team__logo",  \
+        comments = Comment.objects.filter(production_id=period.production_id, status=1).select_related("user", \
+                                                                                                       "user__team").values("user__team__logo",  \
                                                                                                "user__name","user__department" \
                                                                                                ,'user__team__teamname',"context", \
-                                                                                               "time").select_related("user", \
-                                                                                                                      "user__team").all()[number:number+5]
+                                                                                               "time").all()[number:number+5]
         comments = serializer(comments)
         return JsonResponse({'success': True, 'data': comments})
 #查看我的团和分享页展示内容
@@ -147,9 +169,9 @@ def getperiod(request):
     if request.method == 'GET':
         orderid=request.GET.get('orderid','')
         #每期都需要有自己的logo
-        order=Order.objects.filter(orderid=orderid).select_related('period','production').values('period_id','period__logo','production__name', \
+        order=Order.objects.filter(orderid=orderid).select_related('period','production').values('period_id','production__logo','production__name', \
                                                            'period__number','period__startprice','period__cutprice', \
-                                                           'period__endtime','status').select_related("period","production")
+                                                           'period__endtime','status')
 
         period=serializer(order)
         return JsonResponse(period,safe=False)
@@ -162,7 +184,7 @@ def orderlist(request):
         order=Order.objects.filter(user_id=userid).values('orderid','production__logo','production__name', \
                                                            'production__reputation','period__number','status', \
                                                            'period__endtime','period__starttime', \
-                                                          'period_id',
+                                                          'period_id','endprice',
                                                            'period__startprice','period__cutprice', \
                                                           'steam_id','steam__cutprice', \
                                                           'production__team__teamname','production__distance', \
@@ -179,7 +201,7 @@ def orderdetail(request):
     if request.method == 'GET':
         steamid = request.GET.get('steamid', '')
         onecut = Steam.objects.filter(steamid=steamid).values('member__userid','member__name', "member__picture", \
-                                                              "membership__cutprice", "membership__time")
+                                                              "membership__cutprice", "membership__time","member__department","time")
         twocut=Cutting.objects.filter(steamid=steamid).select_related("audience").values('audience__picture','audience__nickname','audience__name','cutprice')
         onecut = serializer(onecut)
         twocut = serializer(twocut)
@@ -196,6 +218,7 @@ def cancel(request):
         nowtime = timezone.now()
         order.time6 = nowtime
         order.save()
+
         return JsonResponse({'success':True})
 #评论
 #验证成功
@@ -207,6 +230,7 @@ def completeorder(request):
         order.status = 4
         nowtime = timezone.now()
         order.time4 = nowtime
+        order.endprice = order.period.startprice - order.period.cutprice - order.steam.cutprice
         order.save()
         return JsonResponse({'success': True})
 
@@ -214,7 +238,8 @@ def completeorder(request):
 def comment(request):
     if request.method == 'POST':
         path = 'comment/'
-        pic = handle_upload_file(request.FILES['file'], str(request.FILES['file']), path)
+        filename=str(uuid.uuid4())+'.jpg'
+        pic = handle_upload_file(request.FILES['file'], filename, path)
         orderid=request.POST.get('orderid','')
         order=Order.objects.get(orderid=orderid)
         comment=order.comment
@@ -234,15 +259,19 @@ def comment(request):
             return JsonResponse({'success': False})
         else:
             context = request.POST.get('context', '')
-            judge = request.POST.get('judge', '')
+            judge1 = request.POST.get('judge1', '')
             commenModel=Comment(context=context,user=order.user,status=0, \
-                                production=order.production,judge=judge,pic1=pic)
+                                production=order.production,judge1=judge1,judge2=5,pic1=pic)
             nowtime = timezone.now()
             commenModel.save()
             order.time5 = nowtime
             order.comment=commenModel
+            order.status=5
             order.save()
-        return JsonResponse({'success': True})
+            return JsonResponse({'success': True})
+    if request.method == 'GET':
+        return JsonResponse({'get': True})
+
 #给定openid,teamid,
 #验证成功
 def buyalone(request):
@@ -269,7 +298,7 @@ def buyalone(request):
             period.cutprice += cutprice
         period.save()
         steam = Steam.objects.create(cutprice=price, steamnumber=1)
-        membership=Membership.objects.create(user=user,steam=steam,cutprice=cutprice)
+        membership=Membership.objects.create(user=user,steam=steam,cutprice=price)
         order = Order.objects.create( user=user, period=period, status=1, steam=steam, cutprice=price,
                       production=period.production)
         return JsonResponse({'success': True, 'orderid':order.orderid,'steamid':steam.steamid, 'price': price})
@@ -352,6 +381,84 @@ def need(request):
         Need.objects.create(user=user,time=nowtime,teamname=teamname)
         return JsonResponse({'success': True})
 
+def sign(request):
+    if request.method == 'GET':
+        userid = request.GET.get('userid', "")
+        user = User.objects.get(userid=userid)
+        gain=User.objects.get('gain','')
+#异常捕获
+        try:
+            Sign.objects.create(user=user,gain=gain)
+            user.account+=gain
+            return JsonResponse({'success': "签到成功"})
+        except:
+            return JsonResponse({'success': "签到成功"})
+
+#抽奖礼物获得，奖项几率有待商榷
+def getgift(request):
+    if request.method == 'GET':
+        userid=request.GET.get('userid','')
+        user=User.objects.get(userid=userid)
+        if user.account>=30:
+            # 随机数
+            new = random.randint(1, 100)
+            if new == 1:
+                gift = Gift.objects.get(id=1)
+                user.account=user.account-30
+                user.save()
+                order = Giftorder.objects.create(user=user, gift=gift, status=0)
+                return JsonResponse({'prize': 1,'account':user.account})
+            elif new == 2:
+                gift = Gift.objects.get(id=2)
+                user.account = user.account - 30
+                user.save()
+                order = Giftorder.objects.create(user=user, gift=gift, status=0)
+                return JsonResponse({'prize': 2,'account':user.account})
+            elif new == 3:
+                gift = Gift.objects.get(id=3)
+                user.account = user.account - 30
+                user.save()
+                order = Giftorder.objects.create(user=user, gift=gift, status=0)
+                return JsonResponse({'prize': 3,'account':user.account})
+            elif new in range(4, 9):
+                gift = Gift.objects.get(id=4)
+                user.account = user.account+30
+                user.save()
+                order = Giftorder.objects.create(user=user, gift=gift, status=0)
+                return JsonResponse({'prize': 4,'account':user.account})
+            elif new in range(9, 15):
+                gift = Gift.objects.get(id=5)
+                user.account = user.account - 30
+                user.save()
+                order = Giftorder.objects.create(user=user, gift=gift, status=0)
+                return JsonResponse({'prize': 5,'account':user.account})
+            elif new in range(15, 50):
+                gift = Gift.objects.get(id=6)
+                user.account = user.account - 30
+                user.save()
+                order = Giftorder.objects.create(user=user, gift=gift, status=0)
+                return JsonResponse({'prize': 6,'account':user.account})
+            else:
+                gift = Gift.objects.get(id=7)
+                user.account = user.account - 25
+                user.save()
+                order = Giftorder.objects.create(user=user, gift=gift, status=0)
+                return JsonResponse({'prize': 7,'account':user.account})
+        else:
+            return JsonResponse({'error': "账户余额不足"})
+
+
+
+def accountdetail(request):
+    if request.method=='GET':
+        userid=request.GET.get('userid','')
+        invitation=User.objects.filter(puser__userid=userid).values('puser__name')
+        invitation=serializer(invitation)
+        sign=Sign.objects.filter(userid=userid).values("time","gain")
+        sign=serializer(sign)
+        gorder=Giftorder.objects.filter(user_id=userid).values("gift__name",'time')
+        gorder=serializer(gorder)
+        return JsonResponse({'invitation': invitation,"sign":sign,"gorder":gorder})
 
 
 
