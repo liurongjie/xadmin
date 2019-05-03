@@ -163,6 +163,5 @@ STATIC_ROOT = os.path.join(BASE_DIR,'static')
 #每天00：02分开始核查，将已经结束的期表状态改为0，结束
 #每天02：02分开始核查，将未进行的期表改为正在进行1，
 CRONJOBS=[
-    ('02 00 * * *','dajia.cron.checkstatus0','>>'+os.path.join(BASE_DIR,'logs/cron1.log')),
-    ('02 02 * * *','dajia.cron.checkstatus1','>>'+os.path.join(BASE_DIR,'logs/cron2.log'))
+    ('02 00 * * *','dajia.cron.orderchange','>>'+os.path.join(BASE_DIR,'logs/cron1.log'))
 ]

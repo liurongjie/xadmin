@@ -7,6 +7,7 @@ from django.conf.urls import include
 urlpatterns = [
     path('justtry', views.justtry, name='尝试'),
     path('login', views.login, name='登陆'),
+    path('getphone', views.getphone, name='手机号获取'),
     path('verify', views.verify, name='实名认证'),
     path('home', views.home, name='首页'),
     path('firstcomment', views.firstcomment, name='首页评论'),
@@ -17,11 +18,10 @@ urlpatterns = [
     path('cancel', views.cancel, name='取消'),
     path('completeorder', views.completeorder, name='订单完成'),
     path('comment', views.comment, name='评论'),
-    path('buyalone', views.buyalone, name='购买'),
-    path('buytogether', views.buytogether, name='购买'),
-    path('need', views.need, name='购买'),
+    path('buysmallboat', views.buysmallboat, name='小船'),
+    path('buybigboat', views.buybigboat, name='大船'),
+    path('need', views.need, name='提交需求'),
     path('cutprice', views.cutprice, name='我要砍价'),
-    path('sign', views.sign, name='签到'),
     path('getgift', views.getgift, name='抽奖'),
     path('accountdetail', views.accountdetail, name='贝壳明细'),
 

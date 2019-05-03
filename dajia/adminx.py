@@ -1,7 +1,7 @@
 import xadmin
 from xadmin import views
-from .models import Team,User,Merchant,Production,Period,Steam,Comment,Order,Cutting,Need,Suggestion,Membership
-from .models import Gift,Giftorder,Sign
+from .models import Team,User,Merchant,Production,Steam,Comment,Order,Cutting,Need,Membership
+from .models import Gift,Giftorder
 # 创建xadmin的最基本管理器配置，并与view绑定
 class BaseSetting(object):
     # 开启主题功能
@@ -26,35 +26,31 @@ class Teamxadmin(object):
 xadmin.site.register(Team,Teamxadmin)
 
 class Userxadmin(object):
-    list_display = {'userid','openid', 'nickname', 'picture','gender', 'status','number','telephone','department','team','name','account'}
+    list_display = {'userid','openid', 'nickname', 'picture','gender', 'status','number','telephone','department','team','account'}
     search_fields = {'team__teamname','nickname'}
     list_filter = {'gender','status','team__teamname'}
 xadmin.site.register(User,Userxadmin)
 
 class Merchantxadmin(object):
-    list_display = {'merchantid','name','location','latitude','longitude','reputation','type','logo','pic1','pic2','pic3'}
-    search_fields = {'name','location'}
-    list_filter = {'type','reputation'}
+    list_display = {'merchantid','name','location','latitude','longitude','type','logo','telephone'}
+    search_fields = {'name'}
+    list_filter = {'type'}
 xadmin.site.register(Merchant,Merchantxadmin)
 
 class Productionxadmin(object):
-    list_display = {'productionid','team','merchant','name','reputation','introduction','introductionpic','type','cutnumber','saveprice','logo'}
+    list_display = {'productionid','team','merchant','name','rank','reputation','introduction','introductionpic','type','logo','distance', \
+                    'startprice','bottomprice','pic1','pic2','pic3','number'}
     search_fields = {'team__name','merchant__name'}
     list_filter = {'type'}
 xadmin.site.register(Production,Productionxadmin)
 
 
-class Periodxadmin(object):
-    list_display = {'periodid','production','starttime','endtime','startprice','bottomprice','type','time','status','cutprice','number','cutnumber','saveprice'}
-    search_fields = {'prodution__name'}
-    list_filter = {'type','status'}
-xadmin.site.register(Period,Periodxadmin)
 
 
 class Steamxadmin(object):
-    list_display = {'steamid','time','cutprice','steamnumber','member'}
+    list_display = {'steamid','time','cutprice','steamnumber','member','endtime'}
     search_fields = {'steamid'}
-    list_filter = {'cutprice'}
+    list_filter = {'cutprice','endtime'}
 xadmin.site.register(Steam,Steamxadmin)
 
 class Memberxadmin(object):
@@ -64,14 +60,14 @@ class Memberxadmin(object):
 xadmin.site.register(Membership,Memberxadmin)
 
 class Commentxadmin(object):
-    list_display = {'commentid','production','user','context','time','pic1','pic2','pic3','status','judge1','judge2'}
+    list_display = {'commentid','production','user','context','time','status',}
     search_fields = {'production__name','user__name'}
-    list_filter = {'status','judge1'}
+    list_filter = {'status'}
 xadmin.site.register(Comment,Commentxadmin)
 
 
 class Orderxadmin(object):
-    list_display = {'orderid','user','period','production','steam','status','cutprice','time1','time2','time3','time4','time5','time6','comment'}
+    list_display = {'orderid','user','production','steam','state','status','cutprice','time1','time2','time3','time4','time5','certificate'}
     search_fields = {'user__name','production__name'}
     list_filter = {'status'}
 xadmin.site.register(Order,Orderxadmin)
@@ -88,11 +84,7 @@ class Needxadmin(object):
     list_filter = {}
 xadmin.site.register(Need,Needxadmin)
 
-class Suggestionxadmin(object):
-    list_display = {'id','user','teamname','pic','time'}
-    search_fields = {'teamname'}
-    list_filter = {}
-xadmin.site.register(Suggestion,Suggestionxadmin)
+
 
 class Giftxadmin(object):
     list_display = {'id','name','worth','pic','time'}
@@ -106,10 +98,6 @@ class Giftorderxadmin(object):
     list_filter = {"user__name","status","gift__name"}
 xadmin.site.register(Giftorder,Giftorderxadmin)
 
-class Signxadmin(object):
-    list_display = {'id','userid','gain','time'}
-    search_fields = {}
-    list_filter = {'userid','time','gain'}
-xadmin.site.register(Sign,Signxadmin)
+
 
 
